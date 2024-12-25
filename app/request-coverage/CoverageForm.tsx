@@ -16,7 +16,7 @@ const CoverageForm = ({ callback }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     callback(date, startTime, endTime);
-    router.push("/dashboard");
+    router.push("/dashboard?requestSuccess=true");
   };
 
   return (

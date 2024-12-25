@@ -160,7 +160,7 @@ const EditSchedule = ({ callback, email }: Props) => {
               onClick={async (e) => {
                 e.preventDefault();
                 await callback(aDayPrep, bDayPrep, aDayLunch, bDayLunch);
-                router.push("/dashboard");
+                router.push("/dashboard?updateSuccess=true");
               }}
             >
               Save Changes
