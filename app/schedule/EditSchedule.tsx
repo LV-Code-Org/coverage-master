@@ -23,7 +23,9 @@ const EditSchedule = ({ callback, email }: Props) => {
 
   const buttonStyles = (selected: boolean) =>
     `px-4 py-2 rounded-md text-sm font-medium ${
-      selected ? "bg-primary text-white" : "bg-gray-200 hover:bg-gray-300"
+      selected
+        ? "bg-primary-light dark:bg-primary-dark text-text-dark"
+        : "bg-gray-200 dark:bg-tertiary-dark dark:text-text-dark dark:hover:bg-secondary-dark"
     }`;
 
   useEffect(() => {
@@ -57,23 +59,19 @@ const EditSchedule = ({ callback, email }: Props) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg font-medium text-gray-600">Loading...</p>
+        <p className="text-lg font-medium">Loading...</p>
       </div>
     );
   }
 
   return (
     <div className="p-10 flex items-center justify-center">
-      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Update Schedule
-        </h2>
+      <div className="w-full max-w-4xl bg-background-light dark:bg-background-dark shadow-md rounded-lg p-8 dark:border dark:border-tertiary-dark">
+        <h2 className="text-2xl font-bold mb-6 text-center">Update Schedule</h2>
         <form className="space-y-8">
           {/* A-Day Prep */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
-              A-Day Prep
-            </label>
+            <label className="block text-lg font-medium mb-2">A-Day Prep</label>
             <div className="flex space-x-4">
               {[1, 3, 5, 7].map((option) => (
                 <button
@@ -90,9 +88,7 @@ const EditSchedule = ({ callback, email }: Props) => {
 
           {/* B-Day Prep */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
-              B-Day Prep
-            </label>
+            <label className="block text-lg font-medium mb-2">B-Day Prep</label>
             <div className="flex space-x-4">
               {[2, 4, 6, 8].map((option) => (
                 <button
@@ -109,7 +105,7 @@ const EditSchedule = ({ callback, email }: Props) => {
 
           {/* A-Day Lunch */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
+            <label className="block text-lg font-medium mb-2">
               A-Day Lunch
             </label>
             <div className="flex space-x-4">
@@ -128,7 +124,7 @@ const EditSchedule = ({ callback, email }: Props) => {
 
           {/* B-Day Lunch */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
+            <label className="block text-lg font-medium mb-2">
               B-Day Lunch
             </label>
             <div className="flex space-x-4">
@@ -149,14 +145,14 @@ const EditSchedule = ({ callback, email }: Props) => {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 rounded px-6 py-2"
+              className="bg-gray-300 dark:bg-tertiary-dark dark:text-text-dark hover:bg-gray-400 text-gray-700 rounded px-6 py-2"
               onClick={() => router.push("/dashboard")}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-primary hover:bg-primary-dark text-white rounded px-6 py-2"
+              className="bg-primary-light dark:bg-primary-dark hover:bg-primary-dark text-white rounded px-6 py-2"
               onClick={async (e) => {
                 e.preventDefault();
                 await callback(aDayPrep, bDayPrep, aDayLunch, bDayLunch);

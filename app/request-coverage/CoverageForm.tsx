@@ -20,18 +20,15 @@ const CoverageForm = ({ callback }: Props) => {
   };
 
   return (
-    <div className="p-8 bg-gray-100 flex items-center justify-center">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+    <div className="p-8 flex items-center justify-center">
+      <div className="bg-background-light dark:bg-background-dark shadow-lg rounded-lg p-8 max-w-md w-full dark:border dark:border-tertiary-dark">
+        <h2 className="text-2xl font-bold mb-6 text-center">
           Request Coverage
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Date */}
           <div>
-            <label
-              htmlFor="date"
-              className="block text-lg font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="date" className="block text-lg font-medium mb-2">
               Date
             </label>
             <input
@@ -39,7 +36,7 @@ const CoverageForm = ({ callback }: Props) => {
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-gray-300 dark:border-tertiary-dark rounded-md px-4 py-2 focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark dark:bg-background-dark"
               required
             />
           </div>
@@ -48,7 +45,7 @@ const CoverageForm = ({ callback }: Props) => {
           <div>
             <label
               htmlFor="start-time"
-              className="block text-lg font-medium text-gray-700 mb-2"
+              className="block text-lg font-medium mb-2"
             >
               Start Time
             </label>
@@ -57,7 +54,7 @@ const CoverageForm = ({ callback }: Props) => {
               id="start-time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-gray-300 dark:border-tertiary-dark rounded-md px-4 py-2 focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark dark:bg-background-dark"
               required
             />
           </div>
@@ -66,7 +63,7 @@ const CoverageForm = ({ callback }: Props) => {
           <div>
             <label
               htmlFor="end-time"
-              className="block text-lg font-medium text-gray-700 mb-2"
+              className="block text-lg font-medium mb-2"
             >
               End Time
             </label>
@@ -75,7 +72,7 @@ const CoverageForm = ({ callback }: Props) => {
               id="end-time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full border border-gray-300 dark:border-tertiary-dark rounded-md px-4 py-2 focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark dark:bg-background-dark"
               required
             />
           </div>
@@ -84,7 +81,7 @@ const CoverageForm = ({ callback }: Props) => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-primary hover:bg-primary-dark text-white font-medium rounded-md px-6 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="bg-primary-light dark:bg-primary-dark hover:bg-primary-dark text-white font-medium rounded-md px-6 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               onClick={handleSubmit}
             >
               Submit Request

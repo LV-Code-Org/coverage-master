@@ -12,7 +12,7 @@ const RequestCoverageBtn = (props: Props) => {
   return (
     <div
       onClick={() => router.push("/request-coverage")}
-      className="bg-primary text-sm text-white px-4 py-2 rounded-md cursor-pointer flex items-center space-x-2"
+      className="bg-primary-light dark:bg-primary-dark text-sm text-white px-4 py-2 rounded-md cursor-pointer flex items-center space-x-2"
     >
       <FaPlus />
       <p className="text-white">Request Coverage</p>

@@ -4,13 +4,14 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import Logout from "./Logout";
 import RequestCoverage from "./RequestCoverage";
+import DarkModeToggle from "./DarkModeToggle";
 
 type Props = {};
 
 const Navbar = async (props: Props) => {
   const session = await auth();
   return (
-    <nav className="border-b border-gray-300 bg-background w-full flex items-center">
+    <nav className="border-b border-gray-300 dark:border-tertiary-dark bg-background w-full flex items-center">
       <div className="flex w-full items-center justify-between my-4">
         {!session?.user ? (
           <Link href={"/"} className="font-bold">
@@ -26,8 +27,8 @@ const Navbar = async (props: Props) => {
                 alt="User Avatar"
                 className="rounded-full"
               />
-            )}
-            {" "}{session.user.name}
+            )}{" "}
+            {session.user.name}
           </div>
         )}
 
@@ -49,6 +50,7 @@ const Navbar = async (props: Props) => {
             </Link>
           ) : (
             <>
+              <DarkModeToggle />
               <Logout />
               <RequestCoverage />
             </>
