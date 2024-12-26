@@ -16,6 +16,7 @@ export default {
         },
         secondary: {
           light: "#f4f4f4",
+          "light-60": "rgba(244, 244, 244, 0.6)",
           dark: "#02040a",
         },
         tertiary: {
@@ -25,6 +26,7 @@ export default {
         background: {
           light: "#fff",
           dark: "#0d1116",
+          "dark-60": "rgba(13, 17, 22, 0.6)",
         },
         text: {
           light: "#333",

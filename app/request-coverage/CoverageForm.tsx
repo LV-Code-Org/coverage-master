@@ -74,7 +74,7 @@ const CoverageForm = ({ callback, email }: Props) => {
 
   return (
     <div className="flex h-screen">
-      <div className="bg-secondary-light border-r dark:border-secondary-dark dark:bg-background-dark flex flex-col p-8 w-1/2">
+      <div className="bg-secondary-light-60 border-r dark:border-secondary-dark dark:bg-background-dark-60 flex flex-col p-8 w-1/2">
         <div className="py-8">
           <h2 className="text-4xl font-bold py-8">Request Coverage</h2>
           <p>
