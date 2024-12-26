@@ -11,7 +11,7 @@ type Props = {};
 const Navbar = async (props: Props) => {
   const session = await auth();
   return (
-    <nav className="border-b border-gray-300 dark:border-tertiary-dark bg-background w-full flex items-center">
+    <nav className="border-b border-gray-300 dark:border-tertiary-light bg-background w-full flex items-center px-8">
       <div className="flex w-full items-center justify-between my-4">
         {!session?.user ? (
           <Link href={"/"} className="font-bold">

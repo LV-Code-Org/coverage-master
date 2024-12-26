@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from utils import Teacher, Interval
 from algorithms import assign_subs_full_day, fill_teachers
+from datetime import datetime
 import os
 import pandas as pd
 
@@ -63,6 +64,31 @@ def find_schedule(email: str) -> dict:
     }
 
     return user_schedule
+
+
+def find_outgoing_requests(email: str) -> list:
+    """
+    Fetch all requests made by a user based on their email.
+
+    :param email: The unique email of the user.
+    """
+    user_requests = requests.find({"email": email})
+    if not user_requests:
+        return []
+
+    def is_today_before(date: str) -> bool:
+        today = datetime.today().strftime("%Y-%m-%d")
+        today_obj = datetime.strptime(today, "%Y-%m-%d")
+        date2_obj = datetime.strptime(date, "%Y-%m-%d")
+
+        return today_obj < date2_obj
+
+    parsed = [{"date": item.get("date"), "startTime": item.get("startTime"), "endTime": item.get("endTime")}
+              for item in list(user_requests)]
+
+    parsed = [item for item in parsed if is_today_before(item.get("date"))]
+
+    return sorted(parsed, key=lambda x: datetime.strptime(x["date"], "%Y-%m-%d"))
 
 
 def add_request(date: str, startTime: str, endTime: str, name: str, email: str) -> None:
@@ -176,5 +202,3 @@ def assign_coverages(date: str, day: str):
     df = fill_teachers(df, teacher_list)
 
     return df
-
-    

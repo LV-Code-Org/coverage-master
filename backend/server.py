@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import update_user_schedule, find_schedule, add_request, assign_coverages
+from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests
 
 app = Flask(__name__)
 CORS(app)
@@ -32,12 +32,12 @@ def submit_request():
 
     print(
         f"Received: date={date}, startTime={startTime}, endTime={endTime}, name={name}, email={email}")
-    
+
     add_request(date, startTime, endTime, name, email)
 
     print(assign_coverages("2024-12-25", "A"))
 
-    return jsonify({"success": True, "message": "Schedule updated successfully"})
+    return jsonify({"success": True, "message": "Request submitted successfully"})
 
 
 @app.route('/api/get-schedule', methods=['GET'])
@@ -53,6 +53,20 @@ def get_schedule():
         return jsonify({"success": False, "message": "User not found"}), 404
 
     return jsonify({"success": True, "data": user_schedule})
+
+
+@app.route('/api/get-outgoing-requests', methods=['GET'])
+def get_outgoing_requests():
+    email = request.args.get("email")
+
+    print(f"[get_outgoing_requests] Received: email={email}")
+
+    if not email:
+        return jsonify({"success": False, "message": "Email is required"}), 400
+
+    user_requests = find_outgoing_requests(email)
+
+    return jsonify({"success": True, "data": user_requests})
 
 
 if __name__ == '__main__':

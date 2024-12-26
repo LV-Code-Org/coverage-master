@@ -30,7 +30,7 @@ const RequestCoverage = async ({ session }: Props) => {
     }
   };
 
-  return <CoverageForm callback={handleSubmit} />;
+  return <CoverageForm callback={handleSubmit} email={session.user.email} />;
 };
 
 export default withAuth(RequestCoverage);

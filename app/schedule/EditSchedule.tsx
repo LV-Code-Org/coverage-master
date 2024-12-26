@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import SVGComponent from "./SvgComponent";
 
 type Props = {
   callback: (
@@ -25,7 +26,7 @@ const EditSchedule = ({ callback, email }: Props) => {
     `px-4 py-2 rounded-md text-sm font-medium ${
       selected
         ? "bg-primary-light dark:bg-primary-dark text-text-dark"
-        : "bg-gray-200 dark:bg-tertiary-dark dark:text-text-dark dark:hover:bg-secondary-dark"
+        : "bg-gray-200 dark:bg-tertiary-light dark:text-text-dark hover:bg-gray-300"
     }`;
 
   useEffect(() => {
@@ -65,10 +66,21 @@ const EditSchedule = ({ callback, email }: Props) => {
   }
 
   return (
-    <div className="p-10 flex items-center justify-center">
-      <div className="w-full max-w-4xl bg-background-light dark:bg-background-dark shadow-md rounded-lg p-8 dark:border dark:border-tertiary-dark">
-        <h2 className="text-2xl font-bold mb-6 text-center">Update Schedule</h2>
-        <form className="space-y-8">
+    <div>
+      <SVGComponent translatey={5}/>
+      <div className="p-10 flex items-center justify-center grid grid-cols-11 gap-8">
+        <div></div>
+        <div className="col-span-4">
+          <h1 className="text-5xl font-bold mb-6">Update Schedule</h1>
+          <h4>
+            {" "}
+            Use this form to update your A-day and B-day schedules, including
+            your prep periods and lunch assignments. Make sure to save your
+            changes once you're done.
+          </h4>
+        </div>
+        <div></div>
+        <form className="animate-slideInRight space-y-8 col-span-4 p-10 dark:bg-background-dark bg-background-light shadow-md rounded-lg dark:border dark:border-tertiary-light">
           {/* A-Day Prep */}
           <div>
             <label className="block text-lg font-medium mb-2">A-Day Prep</label>
@@ -145,7 +157,7 @@ const EditSchedule = ({ callback, email }: Props) => {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              className="bg-gray-300 dark:bg-tertiary-dark dark:text-text-dark hover:bg-gray-400 text-gray-700 rounded px-6 py-2"
+              className="bg-gray-300 dark:bg-tertiary-light dark:text-text-dark hover:bg-gray-400 text-gray-700 rounded px-6 py-2"
               onClick={() => router.push("/dashboard")}
             >
               Cancel
@@ -163,6 +175,7 @@ const EditSchedule = ({ callback, email }: Props) => {
             </button>
           </div>
         </form>
+        <div></div>
       </div>
     </div>
   );

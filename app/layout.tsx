@@ -30,10 +30,12 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-secondary-light text-text-light dark:bg-secondary-dark dark:text-text-dark`}
+          className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased bg-secondary-light text-text-light dark:bg-secondary-dark dark:text-text-dark`}
         >
-          <div className="mx-auto max-w-screen-lg h-screen flex flex-col">
-            <Navbar />
+          <Navbar />
+
+          {/* <div className="mx-auto max-w-screen-lg h-screen flex flex-col"> */}
+          <div className="mx-auto flex flex-col">
             <div className="flex-grow">{children}</div>
           </div>
         </body>
