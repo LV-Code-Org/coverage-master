@@ -48,9 +48,9 @@ const DashLink = ({ email }: Props) => {
         <Link href={"/schedule"}>Schedule</Link>
       </>
     );
+  } else {
+    return <Link href={`/dashboard`}>Dashboard</Link>;
   }
-
-  return <Link href={`/dashboard?admin=true`}>Dashboard</Link>;
 };
 
 export default DashLink;

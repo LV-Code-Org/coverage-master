@@ -161,6 +161,43 @@ def get_requests_by_date(date: str) -> list:
     except Exception as e:
         print(f"An error occurred while fetching requests by date: {e}")
         return []
+    
+
+def get_teacher_involvements_for_date(email: str, date: str) -> dict:
+    """
+    Fetches all coverage requests involving a given teacher on a given date.
+
+    :param email (str): The email of the teacher to match.
+    :param date (str): The date, yyyy-mm-dd, to match.
+
+    Returns:
+        dict: { outgoing:  [...], covering:  [...] }
+    """
+    def convert_email_to_name(email: str) -> str:
+        """Converts an email to a name."""
+        user = users.find_one({"email": email})
+        return user.get("name") if user else "Unknown"
+    
+    def format_output(documents: list) -> list:
+        """Formats the output for the teacher involvements."""
+        return [{
+            "name": doc.get("name"),
+            "startTime": doc.get("startTime"),
+            "endTime": doc.get("endTime"),
+            "sub": convert_email_to_name(doc.get("sub")) if doc.get("sub") else None,
+            "teacher1": convert_email_to_name(doc.get("teacher1")) if doc.get("teacher1") else None,
+            "teacher2": convert_email_to_name(doc.get("teacher2")) if doc.get("teacher2") else None,
+            "teacher1Email": doc.get("teacher1"),
+            "teacher2Email": doc.get("teacher2"),
+        } for doc in documents]
+    
+    try:
+        outgoing_requests = list(requests.find({"email": email, "date": date}))
+        covering_requests = list(requests.find({"$or": [{"teacher1": email}, {"teacher2": email}], "date": date}))
+        return {"outgoing": format_output(outgoing_requests), "covering": format_output(covering_requests)}
+    except Exception as e:
+        print(f"An error occurred while fetching teacher involvements by date: {e}")
+        return {}
 
 
 def init_request_information(date: str, day: str) -> list:
@@ -219,6 +256,11 @@ def assign_coverages(date: str, day: str):
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
     pd.set_option('display.width', 1000)
+
+    should_update_requests = True
+
+    if not should_update_requests:
+        return {}
 
     for index, row in df.iterrows():
         query = {

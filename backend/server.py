@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin
+from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin, get_teacher_involvements_for_date
 
 app = Flask(__name__)
 CORS(app)
@@ -35,8 +35,6 @@ def submit_request():
 
     add_request(date, startTime, endTime, name, email)
 
-    print(assign_coverages("2024-12-25", "A"))
-
     return jsonify({"success": True, "message": "Request submitted successfully"})
 
 
@@ -68,6 +66,19 @@ def get_schedule():
     return jsonify({"success": True, "data": user_schedule})
 
 
+@app.route('/api/get-dashboard-info', methods=['GET'])
+def get_dashboard_info():
+    email = request.args.get("email")
+    date = request.args.get("date")
+
+    if not email:
+        return jsonify({"success": False, "message": "Email is required"}), 400
+
+    teacher_involvements = get_teacher_involvements_for_date(email, date)
+
+    return jsonify({"success": True, "data": teacher_involvements})
+
+
 @app.route('/api/is-admin', methods=['GET'])
 def check_admin():
     email = request.args.get("email")
@@ -75,7 +86,6 @@ def check_admin():
     if not email:
         return jsonify({"success": False, "message": "Email is required"}), 400
 
-    # print(f"[check_admin] Received: email={email}, result={is_admin(email)}")
     return jsonify({"success": True, "data": is_admin(email)})
 
 
