@@ -128,85 +128,90 @@ const Dashboard = ({ session }: Props) => {
       )}
 
       {/* Dashboard content */}
-
-      {incomingRequests.length > 0 && (
+      {incomingRequests.length === 0 && outgoingRequests.length === 0 ? (
+        <div>You're not on the coverage list for today. Rock on!</div>
+      ) : (
         <>
-          <h2 className="text-lg font-semibold py-4">You're covering</h2>
-          <table className="animate-slideInDown w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-background-dark dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  You're covering
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Full coverage block
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Time required
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {incomingRequests.map((request, idx) => (
-                <tr
-                  key={idx}
-                  className={
-                    "bg-white text-black dark:text-white dark:bg-secondary-dark dark:border-gray-700" +
-                    (idx === incomingRequests.length - 1 ? "" : " border-b")
-                  }
-                >
-                  <td className="px-6 py-4">{request.name}</td>
-                  <td className="px-6 py-4">
-                    {request.startTime} - {request.endTime}
-                  </td>
-                  <td className="px-6 py-4">
-                    {request.teacher1Email == session.user.email
-                      ? request.teacher2Email
-                        ? "First half"
-                        : "Full day"
-                      : "Second half"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+          {incomingRequests.length > 0 && (
+            <>
+              <h2 className="text-lg font-semibold py-4">You're covering</h2>
+              <table className="animate-slideInDown w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-background-dark dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      You're covering
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Full coverage block
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Time required
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {incomingRequests.map((request, idx) => (
+                    <tr
+                      key={idx}
+                      className={
+                        "bg-white text-black dark:text-white dark:bg-secondary-dark dark:border-gray-700" +
+                        (idx === incomingRequests.length - 1 ? "" : " border-b")
+                      }
+                    >
+                      <td className="px-6 py-4">{request.name}</td>
+                      <td className="px-6 py-4">
+                        {request.startTime} - {request.endTime}
+                      </td>
+                      <td className="px-6 py-4">
+                        {request.teacher1Email == session.user.email
+                          ? request.teacher2Email
+                            ? "First half"
+                            : "Full day"
+                          : "Second half"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
 
-      {outgoingRequests.length > 0 && (
-        <>
-          <h2 className="text-lg font-semibold py-4">You're covered by</h2>
-          <table className="animate-slideInDown w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-background-dark dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  Covering you
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  Time
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {outgoingRequests.map((request, idx) => (
-                <tr
-                  key={idx}
-                  className={
-                    "bg-white text-black dark:text-white dark:bg-secondary-dark dark:border-gray-700" +
-                    (idx === outgoingRequests.length - 1 ? "" : " border-b")
-                  }
-                >
-                  <td className="px-6 py-4">
-                    {request.teacher1}
-                    {request.teacher2 && `, ${request.teacher2}`}
-                  </td>
-                  <td className="px-6 py-4">
-                    {request.startTime} - {request.endTime}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {outgoingRequests.length > 0 && (
+            <>
+              <h2 className="text-lg font-semibold py-4">You're covered by</h2>
+              <table className="animate-slideInDown w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-background-dark dark:text-gray-400">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Covering you
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Time
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {outgoingRequests.map((request, idx) => (
+                    <tr
+                      key={idx}
+                      className={
+                        "bg-white text-black dark:text-white dark:bg-secondary-dark dark:border-gray-700" +
+                        (idx === outgoingRequests.length - 1 ? "" : " border-b")
+                      }
+                    >
+                      <td className="px-6 py-4">
+                        {request.teacher1}
+                        {request.teacher2 && `, ${request.teacher2}`}
+                      </td>
+                      <td className="px-6 py-4">
+                        {request.startTime} - {request.endTime}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
         </>
       )}
     </div>
