@@ -26,7 +26,7 @@ const expandDate = (date: string) => {
     "December",
   ];
 
-  return `${months[parseInt(mm, 10) - 1]} ${dd}, ${yyyy}`;
+  return `${months[parseInt(mm, 10) - 1]} ${parseInt(dd)}, ${yyyy}`;
 };
 
 const CoverageForm = ({ callback, email }: Props) => {
@@ -83,7 +83,6 @@ const CoverageForm = ({ callback, email }: Props) => {
           </p>
         </div>
         <form onSubmit={handleSubmit} className="grid grid-rows-4 gap-8">
-
           <div>
             <label htmlFor="date" className="block text-lg font-medium mb-2">
               Date
@@ -148,13 +147,13 @@ const CoverageForm = ({ callback, email }: Props) => {
         <h2 className="text-2xl font-bold py-8">Outgoing Requests</h2>
 
         <div>
-          <SVGComponent translatey={20} />
+          <SVGComponent translatey={20} opacity={0.6} />
 
           {loading ? (
             <p>Loading...</p>
           ) : (
             <div className="relative overflow-x-auto">
-              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <table className="animate-slideInDown w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-background-dark dark:text-gray-400">
                   <tr>
                     <th scope="col" className="px-6 py-3">

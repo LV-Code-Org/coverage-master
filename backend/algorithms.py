@@ -60,7 +60,7 @@ def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
                         available[idx].append(teacher)
 
     picked_values = pick_unique_values(
-        {x: [y.name for y in y] for x, y in available.items() if df.loc[x]["Assigned Sub"] == "None"})
+        {x: [y.email for y in y] for x, y in available.items() if df.loc[x]["Assigned Sub"] == "None"})
     for idx, values in picked_values.items():
         if len(values) > 0:
             df.loc[idx, "Teacher 1"] = values[0]

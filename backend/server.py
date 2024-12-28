@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests
+from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin
 
 app = Flask(__name__)
 CORS(app)
@@ -40,6 +40,19 @@ def submit_request():
     return jsonify({"success": True, "message": "Request submitted successfully"})
 
 
+@app.route('/api/assign-coverages', methods=['POST'])
+def assign_coverages_route():
+    data = request.json
+    date = data.get('date')
+    day = data.get('day')
+
+    print(f"Received: date={date}, day={day}")
+
+    assign_coverages(date, day)
+
+    return jsonify({"success": True, "message": "Coverages assigned successfully"})
+
+
 @app.route('/api/get-schedule', methods=['GET'])
 def get_schedule():
     email = request.args.get("email")
@@ -53,6 +66,17 @@ def get_schedule():
         return jsonify({"success": False, "message": "User not found"}), 404
 
     return jsonify({"success": True, "data": user_schedule})
+
+
+@app.route('/api/is-admin', methods=['GET'])
+def check_admin():
+    email = request.args.get("email")
+
+    if not email:
+        return jsonify({"success": False, "message": "Email is required"}), 400
+
+    # print(f"[check_admin] Received: email={email}, result={is_admin(email)}")
+    return jsonify({"success": True, "data": is_admin(email)})
 
 
 @app.route('/api/get-outgoing-requests', methods=['GET'])

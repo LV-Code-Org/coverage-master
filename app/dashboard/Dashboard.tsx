@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import AdminDashboard from "./AdminDashboard";
 
 type Props = {
   session: any;
@@ -11,8 +12,12 @@ const Dashboard = ({ session }: Props) => {
   const searchParams = useSearchParams();
   const [showPopup, setShowPopup] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
+    if (searchParams.get("admin") === "true") {
+      setAdmin(true);
+    }
     if (
       searchParams.get("requestSuccess") === "true" ||
       searchParams.get("updateSuccess") === "true"
@@ -35,6 +40,11 @@ const Dashboard = ({ session }: Props) => {
     }
   }, [searchParams]);
 
+
+  if (admin) {
+    return <AdminDashboard email={session.user.email} />;
+  }
+  
   return (
     <div className="flex h-full items-center justify-center flex-col gap-2 relative">
       <h1 className="text-3xl font-display">Dashboard</h1>

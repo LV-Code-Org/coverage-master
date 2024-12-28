@@ -67,7 +67,7 @@ const EditSchedule = ({ callback, email }: Props) => {
 
   return (
     <div>
-      <SVGComponent translatey={5}/>
+      <SVGComponent translatey={5} opacity={0.4}/>
       <div className="p-10 flex items-center justify-center grid grid-cols-11 gap-8">
         <div></div>
         <div className="col-span-4">

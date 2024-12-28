@@ -3,6 +3,7 @@ import * as React from "react";
 type Props = {
   className?: string;
   translatey: number;
+  opacity: number;
 };
 
 const SVGComponent = (props: Props) => (
@@ -12,13 +13,12 @@ const SVGComponent = (props: Props) => (
       width={window.innerWidth}
       viewBox="0 0 1440 810"
       height={window.innerHeight}
-      opacity={30}
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         zIndex: -1,
-        opacity: 0.6,
+        opacity: props.opacity,
         transform: `translateY(${props.translatey}%)`,
         overflow: "hidden"
       }}

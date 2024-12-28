@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import Logout from "./Logout";
 import RequestCoverage from "./RequestCoverage";
 import DarkModeToggle from "./DarkModeToggle";
+import DashLink from "./DashLink";
 
 type Props = {};
 
@@ -33,10 +34,9 @@ const Navbar = async (props: Props) => {
         )}
 
         <div className="flex items-center gap-x-5">
-          <Link href={"/dashboard"}>Dashboard</Link>
           {session?.user && (
             <>
-              <Link href={"/schedule"}>Schedule</Link>
+              <DashLink email={session?.user?.email} />
             </>
           )}
         </div>

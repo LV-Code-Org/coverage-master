@@ -66,6 +66,20 @@ def find_schedule(email: str) -> dict:
     return user_schedule
 
 
+def is_admin(email: str) -> bool:
+    """
+    Check if a user is an admin based on their email.
+
+    :param email: The unique email of the user.
+    """
+    user = users.find_one({"email": email})
+
+    if not user:
+        return False
+
+    return user.get("role") == "ADMIN"
+
+
 def find_outgoing_requests(email: str) -> list:
     """
     Fetch all requests made by a user based on their email.
@@ -106,7 +120,11 @@ def add_request(date: str, startTime: str, endTime: str, name: str, email: str) 
         "startTime": startTime,
         "endTime": endTime,
         "name": name,
-        "email": email
+        "email": email,
+        "sub": None,
+        "isSub": False,
+        "teacher1": None,
+        "teacher2": None
     }
 
     requests.insert_one(request)
@@ -159,6 +177,7 @@ def init_request_information(date: str, day: str) -> list:
     df_rows = []
 
     def find_nth_even_odd(number: int) -> int:
+        """[1,3,5,7,...] -> [1,2,3,4,...]; [2,4,6,8,...] -> [1,2,3,4,...]"""
         if number % 2 == 0:
             return number // 2
         else:
@@ -175,9 +194,9 @@ def init_request_information(date: str, day: str) -> list:
             "Needs Coverage": request.get("name"),
             "Email": request.get("email"),
             "Time": interval,
-            "Assigned Sub": "None",
-            "Teacher 1": "None",
-            "Teacher 2": "None"
+            "Assigned Sub": request.get("sub") if request.get("sub") else "None",
+            "Teacher 1": request.get("teacher1") if request.get("teacher1") else "None",
+            "Teacher 2": request.get("teacher2") if request.get("teacher2") else "None"
         })
 
     df = pd.DataFrame(df_rows)
@@ -187,18 +206,36 @@ def init_request_information(date: str, day: str) -> list:
 
 def assign_coverages(date: str, day: str):
     """
-    Assigns coverages for a given date and day.
+    Assigns coverages for a given date and day. Updates the requests collection with the assigned teachers.
 
     :param date (str): The date to assign coverages for.
     :param day (str): The day (A or B) that the coverage is on.
     """
     teacher_list, df = init_request_information(date, day)
 
-    print("\nTEACHERS:")
-    for teacher in teacher_list:
-        teacher.print_schedule()
-    print('\n"NEEDS COVERAGE" DATAFRAME:')
     df = assign_subs_full_day(df)
     df = fill_teachers(df, teacher_list)
+
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
+
+    for index, row in df.iterrows():
+        query = {
+            "date": date,
+            "startTime": row["Time"].start,
+            "endTime": row["Time"].end,
+            "name": row["Needs Coverage"],
+            "email": row["Email"]
+        }
+        update = {
+            "$set": {
+                "teacher1": row["Teacher 1"] if row["Teacher 1"] != "None" else None,
+                "teacher2": row["Teacher 2"] if row["Teacher 2"] != "None" else None,
+                "sub": row["Assigned Sub"] if row["Assigned Sub"] != "None" else None,
+                "isSub": row["Assigned Sub"] != "None"
+            }
+        }
+        requests.update_one(query, update)
 
     return df
