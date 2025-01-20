@@ -3,9 +3,29 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import AdminDashboard from "./AdminDashboard";
+import SVGComponent from "../schedule/SvgComponent";
 
 type Props = {
   session: any;
+};
+
+const prettifyTimeRange = (timeRange: string) => {
+  const convertTo12Hour = (time: string) => {
+    let [hour, minute] = time.split(":").map(Number);
+    const period = hour >= 12 ? "p.m." : "a.m.";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const [start, end] = timeRange.split(" - ").map(convertTo12Hour);
+
+  const startPeriod = start.slice(-4);
+  const endPeriod = end.slice(-4);
+
+  if (startPeriod === endPeriod) {
+    return `${start.slice(0, -4)} ${startPeriod} - ${end}`;
+  }
+  return `${start} - ${end}`;
 };
 
 const Dashboard = ({ session }: Props) => {
@@ -112,6 +132,9 @@ const Dashboard = ({ session }: Props) => {
 
   return (
     <div className="flex h-full justify-center flex-col gap-2 relative p-8">
+      {/* Graphic */}
+      <SVGComponent translatey={0} opacity={0.5} />
+
       {/* Pop-up from search parameters */}
       {showPopup && (
         <div
@@ -160,7 +183,9 @@ const Dashboard = ({ session }: Props) => {
                     >
                       <td className="px-6 py-4">{request.name}</td>
                       <td className="px-6 py-4">
-                        {request.startTime} - {request.endTime}
+                        {prettifyTimeRange(
+                          `${request.startTime} - ${request.endTime}`
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         {request.teacher1Email == session.user.email
@@ -200,11 +225,19 @@ const Dashboard = ({ session }: Props) => {
                       }
                     >
                       <td className="px-6 py-4">
-                        {request.teacher1}
-                        {request.teacher2 && `, ${request.teacher2}`}
+                        {request.teacher1 || request.teacher2 ? (
+                          <>
+                            {request.teacher1}
+                            {request.teacher2 && `, ${request.teacher2}`}
+                          </>
+                        ) : (
+                          <>{request.sub}</>
+                        )}
                       </td>
                       <td className="px-6 py-4">
-                        {request.startTime} - {request.endTime}
+                        {prettifyTimeRange(
+                          `${request.startTime} - ${request.endTime}`
+                        )}
                       </td>
                     </tr>
                   ))}

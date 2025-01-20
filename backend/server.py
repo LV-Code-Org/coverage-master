@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin, get_teacher_involvements_for_date
+from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin, get_teacher_involvements_for_date, get_all_users
 
 app = Flask(__name__)
 CORS(app)
@@ -43,8 +43,10 @@ def assign_coverages_route():
     data = request.json
     date = data.get('date')
     day = data.get('day')
+    subs = data.get('substitutes')
 
     print(f"Received: date={date}, day={day}")
+    print(subs)
 
     assign_coverages(date, day)
 
@@ -69,6 +71,7 @@ def get_schedule():
 @app.route('/api/get-dashboard-info', methods=['GET'])
 def get_dashboard_info():
     email = request.args.get("email")
+    # email = "stoudtt@whitehallcoplay.org"
     date = request.args.get("date")
 
     if not email:
@@ -101,6 +104,13 @@ def get_outgoing_requests():
     user_requests = find_outgoing_requests(email)
 
     return jsonify({"success": True, "data": user_requests})
+
+
+@app.route('/api/get-all-teachers', methods=['GET'])
+def get_all_teachers():
+    all_users = get_all_users()
+    new_dict = [{key: value for key, value in u.items() if key != "_id"} for u in all_users]
+    return jsonify({"success": True, "data": new_dict})
 
 
 if __name__ == '__main__':
