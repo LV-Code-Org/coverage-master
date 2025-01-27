@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin, get_teacher_involvements_for_date, get_all_users
+from db import update_user_schedule, find_schedule, add_request, assign_coverages, find_outgoing_requests, is_admin, get_teacher_involvements_for_date, get_all_users, get_all_coverages_for_date, name_from_email
+from utils import format_name
 
 app = Flask(__name__)
 CORS(app)
@@ -46,9 +47,13 @@ def assign_coverages_route():
     subs = data.get('substitutes')
 
     print(f"Received: date={date}, day={day}")
-    print(subs)
 
-    assign_coverages(date, day)
+    parsedSubs = {}
+    for sub in subs:
+        if sub["teacher"] is not None:
+            parsedSubs[sub["teacher"]] = sub["substitute"]
+
+    assign_coverages(date, day, parsedSubs)
 
     return jsonify({"success": True, "message": "Coverages assigned successfully"})
 
@@ -71,7 +76,6 @@ def get_schedule():
 @app.route('/api/get-dashboard-info', methods=['GET'])
 def get_dashboard_info():
     email = request.args.get("email")
-    # email = "stoudtt@whitehallcoplay.org"
     date = request.args.get("date")
 
     if not email:
@@ -109,7 +113,29 @@ def get_outgoing_requests():
 @app.route('/api/get-all-teachers', methods=['GET'])
 def get_all_teachers():
     all_users = get_all_users()
-    new_dict = [{key: value for key, value in u.items() if key != "_id"} for u in all_users]
+    new_dict = [{key: value for key, value in u.items() if key != "_id"}
+                for u in all_users]
+
+    for user in new_dict:
+        user["name"] = format_name(user["name"])
+
+    return jsonify({"success": True, "data": new_dict})
+
+
+@app.route('/api/get-all-coverages-for-date', methods=['GET'])
+def get_coverages_for_date():
+    date = request.args.get("date")
+
+    result = get_all_coverages_for_date(date)
+    new_dict = [{key: value for key, value in u.items() if key != "_id"}
+                for u in result]
+
+    for cov_req in new_dict:
+        if cov_req["teacher1"] is not None:
+            cov_req["teacher1"] = name_from_email(cov_req["teacher1"])
+        if cov_req["teacher2"] is not None:
+            cov_req["teacher2"] = name_from_email(cov_req["teacher2"])
+
     return jsonify({"success": True, "data": new_dict})
 
 

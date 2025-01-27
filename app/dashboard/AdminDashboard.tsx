@@ -1,6 +1,6 @@
 "use client";
 
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash, FaExclamationTriangle } from "react-icons/fa";
 import React, { useState, useEffect } from "react";
 import { BsFillPeopleFill } from "react-icons/bs";
 import SVGComponent from "../schedule/SvgComponent";
@@ -11,12 +11,47 @@ interface UserRecord {
   name: string;
 }
 
+type ScheduleItem = {
+  date: string;
+  email: string;
+  endTime: string;
+  isSub: boolean;
+  name: string;
+  startTime: string;
+  sub: string | null;
+  teacher1: string | null;
+  teacher2: string | null;
+};
+
+const prettifyTimeRange = (timeRange: string) => {
+  const convertTo12Hour = (time: string) => {
+    let [hour, minute] = time.split(":").map(Number);
+    const period = hour >= 12 ? "p.m." : "a.m.";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const [start, end] = timeRange.split(" - ").map(convertTo12Hour);
+
+  const startPeriod = start.slice(-4);
+  const endPeriod = end.slice(-4);
+
+  if (startPeriod === endPeriod) {
+    return `${start.slice(0, -4)} ${startPeriod} - ${end}`;
+  }
+  return `${start} - ${end}`;
+};
+
 const AdminDashboard = ({ email }: Props) => {
   const [teachers, setTeachers] = useState<string[]>([]);
   const [substitutes, setSubstitutes] = useState<Record<string, string>>({});
   const [rows, setRows] = useState<
     { teacher: string | null; substitute: string; isOpen: boolean }[]
   >([{ teacher: null, substitute: "", isOpen: false }]);
+  const [fadeOut, setFadeOut] = useState<boolean>(false);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [coverages, setCoverages] = useState<ScheduleItem[]>([]);
+  const [unresolved, setUnresolved] = useState<ScheduleItem[]>([]);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -41,6 +76,11 @@ const AdminDashboard = ({ email }: Props) => {
 
     checkAdmin();
   }, [email]);
+
+  useEffect(() => {
+    const populate = async () => await repopulate_assignment_table();
+    populate();
+  }, []);
 
   const toggleDropdown = (index: number) => {
     setRows((prevRows) =>
@@ -76,12 +116,112 @@ const AdminDashboard = ({ email }: Props) => {
     setRows((prevRows) => prevRows.filter((_, idx) => idx !== index));
   };
 
+  const repopulate_assignment_table = async () => {
+    try {
+      if (!email) {
+        return;
+      }
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/get-all-coverages-for-date?date=${encodeURIComponent(
+          "2024-12-29"
+        )}`
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        setCoverages(result.data);
+        setUnresolved([]);
+        for (const item of result.data) {
+          if ((item.teacher1 === null || item.teacher2 === null) && !item.sub) {
+            setUnresolved((prev) => [...prev, item]);
+          }
+        }
+        // console.log(unresolved)
+      } else {
+        console.error("Failed to get all users:", result.message);
+      }
+    } catch (error) {
+      console.error("Error getting users:", error);
+    }
+  };
+
+  const renderList = (list: ScheduleItem[]) => {
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full">
+          <thead className="py-2 bg-gray-50 dark:bg-background-dark dark:text-gray-400">
+            <tr>
+              <th className="px-4 py-2">Date</th>
+              <th className="px-4 py-2">Requester</th>
+              <th className="px-4 py-2">Time</th>
+              <th className="px-4 py-2">Teacher 1</th>
+              <th className="px-4 py-2">Teacher 2</th>
+            </tr>
+          </thead>
+          <tbody className="py-2">
+            {coverages.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-4 text-center">
+                  Loading...
+                </td>
+              </tr>
+            ) : (
+              list.map((item, index) => (
+                <tr key={index}>
+                  <td className="px-4 py-2">{item.date}</td>
+                  <td className="px-4 py-2">{item.name}</td>
+                  <td className="px-4 py-2">
+                    {prettifyTimeRange(`${item.startTime} - ${item.endTime}`)}
+                  </td>
+                  {item.sub ? (
+                    <>
+                      <td colSpan={2} className="px-4 py-2 text-center">
+                        {item.sub}
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-4 py-2">
+                        {item.teacher1 ? item.teacher1 : "N/A"}
+                      </td>
+                      <td className="px-4 py-2">
+                        {item.teacher2 ? item.teacher2 : "N/A"}
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const assignCoverages = async () => {
     const updatedSubstitutes = rows.reduce((acc, row) => {
       if (row.teacher) acc[row.teacher] = row.substitute;
       return acc;
     }, {} as Record<string, string>);
     setSubstitutes(updatedSubstitutes);
+
+    const popUpAction = () => {
+      setShowPopup(true);
+
+      const fadeOutTimer = setTimeout(() => {
+        setFadeOut(true);
+      }, 3000);
+
+      const hideTimer = setTimeout(() => {
+        setShowPopup(false);
+        setFadeOut(false);
+      }, 4000);
+
+      return () => {
+        clearTimeout(fadeOutTimer);
+        clearTimeout(hideTimer);
+      };
+    };
 
     try {
       await fetch(`http://127.0.0.1:5000/api/assign-coverages`, {
@@ -95,6 +235,8 @@ const AdminDashboard = ({ email }: Props) => {
           substitutes: rows,
         }),
       });
+      await repopulate_assignment_table();
+      popUpAction();
     } catch (error) {
       console.error("Error fetching requests:", error);
     }
@@ -104,9 +246,21 @@ const AdminDashboard = ({ email }: Props) => {
     <div className="flex h-full justify-center flex-col gap-2 relative p-8">
       <SVGComponent translatey={0} opacity={0.3} />
 
+      {/* Pop-up */}
+      {showPopup && (
+        <div
+          className={`absolute top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-1000 ${
+            fadeOut ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Coverages assigned! You can re-assign coverages if necessary by
+          clicking the button again.
+        </div>
+      )}
+
       <h1 className="text-3xl font-semibold">Welcome, Admin</h1>
-      <h3 className="text-1xl pb-5">Today is January 20, 2025</h3>
-      <p>
+      <h3 className="text-1xl pb-3">Today is December 29, 2024</h3>
+      <p className="py-2">
         Before assigning coverages, make sure to fill out which substitutes are
         replacing which teachers in the building today.
       </p>
@@ -204,6 +358,20 @@ const AdminDashboard = ({ email }: Props) => {
         <BsFillPeopleFill />
         <p className="text-white">Assign Coverages</p>
       </button>
+
+      <div className="py-6">
+        {unresolved.length > 0 && (
+          <div className="mb-4">
+            <h2 className="py-2 my-4 text-white bg-red-400 dark:bg-red-500 rounded-md px-4">
+              <FaExclamationTriangle className="inline-block mr-2" />
+              You have unresolved coverages
+            </h2>
+            {renderList(unresolved)}
+          </div>
+        )}
+        <h1 className="text-2xl font-bold my-4">Schedule Table</h1>
+        {renderList(coverages)}
+      </div>
     </div>
   );
 };

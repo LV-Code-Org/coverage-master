@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from utils import Teacher, Interval
+from utils import Teacher, Interval, format_name
 from algorithms import assign_subs_full_day, fill_teachers
 from datetime import datetime
 import os
@@ -243,7 +243,34 @@ def init_request_information(date: str, day: str) -> list:
     return teacher_list, df
 
 
-def assign_coverages(date: str, day: str):
+def name_from_email(email: str):
+    """Return an name from a user's email."""
+    try:
+        user = users.find_one({"role": "USER", "email": email})
+        return user["name"]
+    except Exception as e:
+        print(f"Error finding user with email {email}: {e}")
+        return {}
+    
+
+def get_all_coverages_for_date(date: str) -> list:
+    """
+    Fetches all coverages for a given date.
+
+    :param date (str): The date to fetch coverages for.
+
+    Returns:
+        list: A list of coverages for the given date.
+    """
+    try:
+        coverages = list(requests.find({"date": date}))
+        return coverages
+    except Exception as e:
+        print(f"An error occurred while fetching coverages for date: {e}")
+        return []
+
+
+def assign_coverages(date: str, day: str, subs: dict):
     """
     Assigns coverages for a given date and day. Updates the requests collection with the assigned teachers.
 
@@ -252,16 +279,29 @@ def assign_coverages(date: str, day: str):
     """
     teacher_list, df = init_request_information(date, day)
 
-    df = assign_subs_full_day(df)
-    df = fill_teachers(df, teacher_list)
-
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
     pd.set_option('display.width', 1000)
 
+    for i in range(len(teacher_list)):
+        teacher = teacher_list[i]
+        name = format_name(teacher.name)
+        if name in subs.keys():
+            teacher_list.insert(i, Teacher(
+                subs[name], f"{subs[name]}", teacher.prep, teacher.lunch))
+            teacher_list.remove(teacher)
+
+    # for t in teacher_list:
+    #     print(t, end=", ")
+    # print()
+
+    df = assign_subs_full_day(df, subs)
+
+    df = fill_teachers(df, teacher_list, subs)
+
     print(df)
 
-    should_update_requests = True
+    should_update_requests = False
 
     if not should_update_requests:
         return {}

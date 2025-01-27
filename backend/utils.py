@@ -119,3 +119,50 @@ class Teacher:
         print(self.name)
         for time in self.schedule.keys():
             print(f"{time}: {self.schedule[time]}")
+
+
+def format_name(full_name):
+    """
+    Converts a name from 'First Middle(s) Last' format to 'Last, First Middle(s)'.
+
+    Parameters:
+        full_name (str): The name in 'First Middle(s) Last' format.
+
+    Returns:
+        str: The name in 'Last, First Middle(s)' format.
+    """
+    parts = full_name.split()  # Split the name into parts
+    if len(parts) < 2:
+        raise ValueError("Name must contain at least a first and last name.")
+    
+    first = parts[0]
+    last = parts[-1]
+    middle = " ".join(parts[1:-1])  # Combine any middle name(s) into a single string
+
+    if middle:
+        return f"{last}, {first} {middle}"
+    else:
+        return f"{last}, {first}"
+
+
+def unformat_name(name):
+    """
+    Converts a name from 'Last, First Middle(s)' to 'First Middle(s) Last'.
+
+    Parameters:
+        name (str): The name in 'Last, First Middle(s)' format.
+
+    Returns:
+        str: The name in 'First Middle(s) Last' format.
+    """
+    if "," not in name:
+        raise ValueError("Name must be in 'Last, First Middle(s)' format.")
+    
+    last, rest = name.split(",", 1)
+    parts = rest.strip().split()
+    if len(parts) < 1:
+        raise ValueError("Name must contain at least a first name.")
+    
+    first = parts[0]
+    middle = " ".join(parts[1:])  # Combine any middle names
+    return f"{first} {middle} {last}".strip()

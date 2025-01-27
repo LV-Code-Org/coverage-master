@@ -1,37 +1,53 @@
 import pandas as pd
 from random import sample
-from utils import Interval
+from utils import Interval, unformat_name, format_name
 import json
 
 
-def assign_subs_full_day(df: pd.DataFrame, available_subs=["Sub A", "Sub B", "Sub C", "Sub D", "Sub E"]) -> pd.DataFrame:
+# def assign_subs_full_day(df: pd.DataFrame, available_subs=["Sub A", "Sub B", "Sub C", "Sub D", "Sub E"]) -> pd.DataFrame:
+#     """
+#     Assigns substitute teachers to cover individual teachers for the full day.
+#     Populates the `Assigned Sub` DataFrame column.
+#     """
+
+#     value_counts = df["Needs Coverage"].value_counts()
+#     frequencies = dict(value_counts.reset_index().values.tolist())
+
+#     need_subs = []
+#     for teacher in frequencies.keys():
+#         if frequencies[teacher] >= 6:
+#             need_subs.append(teacher)
+
+#     still_needs_subs = need_subs.copy()
+
+#     for teacher_needing_sub in need_subs:
+#         if len(available_subs) > 0:
+#             s = available_subs.pop()
+#             df.loc[df["Needs Coverage"] ==
+#                    teacher_needing_sub, 'Assigned Sub'] = s
+#             still_needs_subs.remove(teacher_needing_sub)
+
+#     return df
+
+def assign_subs_full_day(df: pd.DataFrame, replacements: dict) -> pd.DataFrame:
     """
     Assigns substitute teachers to cover individual teachers for the full day. 
     Populates the `Assigned Sub` DataFrame column.
     """
 
-    value_counts = df["Needs Coverage"].value_counts()
-    frequencies = dict(value_counts.reset_index().values.tolist())
-
-    need_subs = []
-    for teacher in frequencies.keys():
-        if frequencies[teacher] >= 6:
-            need_subs.append(teacher)
-
-    still_needs_subs = need_subs.copy()
-
-    for teacher_needing_sub in need_subs:
-        if len(available_subs) > 0:
-            s = available_subs.pop()
-            df.loc[df["Needs Coverage"] ==
-                   teacher_needing_sub, 'Assigned Sub'] = s
-            still_needs_subs.remove(teacher_needing_sub)
-
+    for idx, row in df.iterrows():
+        if row["Needs Coverage"] in replacements.keys():
+            row["Assigned Sub"] = replacements[row["Needs Coverage"]]
+            row["Teacher 1"] = None
+            row["Teacher 2"] = None
+        else:
+            row["Assigned Sub"] = None
     return df
 
 
-def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
+def fill_teachers(df: pd.DataFrame, teachers: list, subs: dict) -> pd.DataFrame:
     """Uses teachers to fill the remaining coverages to the best of their ability."""
+    from db import name_from_email
 
     # def determine_teachers_required(window: Interval) -> int:
     #     """Determines the number of teachers required to cover a given time window."""
@@ -41,7 +57,6 @@ def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
     #         Interval("11:00", "13:15"): [Interval("11:00", "11:45"), Interval("11:45", "12:30")],
     #         Interval("13:15", "14:45"): [Interval("12:30", "1:15"), Interval("1:15", "2:00")],
     #     }
-        
 
     def pick_unique_values(data):
         picked_values = set()
@@ -58,6 +73,8 @@ def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
 
             if len(available_values) >= 2:
                 selected_pair = sample(available_values, 2)
+                for x in selected_pair:
+                    available_values.remove(x)
                 picked_values.update(selected_pair)
                 selected_values[key] = selected_pair
             elif len(available_values) == 1:
@@ -70,13 +87,13 @@ def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
 
     available = {n: [] for n in range(df.shape[0])}
     for idx, row in df.iterrows():
-        if row["Assigned Sub"] == "None":
+        if row["Assigned Sub"] == None or row["Assigned Sub"] == "None":
             for teacher in teachers:
                 teacher_activities = teacher.find_location(row["Time"])
                 if "Prep" in teacher_activities.values() and len(teacher_activities) == 1:
+                    # TODO: make sure teacher in question isn't requesting coverage during time of request
                     if row["Email"] != teacher.email:
                         available[idx].append(teacher)
-
 
     picked_values = pick_unique_values(
         {x: [y.email for y in y] for x, y in available.items() if df.loc[x]["Assigned Sub"] == "None"})
@@ -86,6 +103,21 @@ def fill_teachers(df: pd.DataFrame, teachers: list) -> pd.DataFrame:
             df.loc[idx, "Teacher 1"] = values[0]
         if len(values) > 1:
             df.loc[idx, "Teacher 2"] = values[1]
+
+    # for idx, row in df.iterrows():
+    #     # if row["Teacher 1"] is None or row["Teacher 2"] is None:
+    #     #     print(row["Teacher 1"], row["Teacher 2"])
+    #     if "@" not in str(row["Teacher 1"]) and str(row["Teacher 1"]) != "None":
+    #         print(row["Teacher 1"])
+    #         if format_name(name_from_email(row["Teacher 1"])) in subs.keys():
+    #             row["Teacher 1"] = subs[format_name(
+    #                 name_from_email(row["Teacher 1"]))]
+
+    #     if "@" not in str(row["Teacher 2"]) and str(row["Teacher 2"]) != "None":
+    #         print(row["Teacher 2"])
+    #         if format_name(name_from_email(row["Teacher 2"])) in subs.keys():
+    #             row["Teacher 2"] = subs[format_name(
+    #                 name_from_email(row["Teacher 2"]))]
 
     pd.set_option('display.max_rows', None)
     return df

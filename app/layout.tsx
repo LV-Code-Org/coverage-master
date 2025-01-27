@@ -30,7 +30,7 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased bg-secondary-light text-text-light dark:bg-secondary-dark dark:text-text-dark`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-secondary-light text-text-light dark:bg-secondary-dark dark:text-text-dark`}
         >
           <Navbar />
 
