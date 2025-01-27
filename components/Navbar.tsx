@@ -44,17 +44,17 @@ const Navbar = async (props: Props) => {
         <div className="flex items-center gap-x-5">
           {!session?.user ? (
             <Link href="/sign-in">
-              <div className="bg-indigo-600 text-white px-4 py-2 rounded-md">
+              <div className="bg-primary-light dark:bg-primary-dark text-white px-4 py-2 rounded-md">
                 Sign In
               </div>
             </Link>
           ) : (
             <>
-              <DarkModeToggle />
               <Logout />
               <RequestCoverage />
             </>
           )}
+          <DarkModeToggle />
         </div>
       </div>
     </nav>

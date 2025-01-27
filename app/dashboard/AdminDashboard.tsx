@@ -77,10 +77,10 @@ const AdminDashboard = ({ email }: Props) => {
     checkAdmin();
   }, [email]);
 
-  useEffect(() => {
-    const populate = async () => await repopulate_assignment_table();
-    populate();
-  }, []);
+  // useEffect(() => {
+  //   const populate = async () => await repopulate_assignment_table();
+  //   populate();
+  // }, []);
 
   const toggleDropdown = (index: number) => {
     setRows((prevRows) =>
@@ -359,19 +359,21 @@ const AdminDashboard = ({ email }: Props) => {
         <p className="text-white">Assign Coverages</p>
       </button>
 
-      <div className="py-6">
-        {unresolved.length > 0 && (
-          <div className="mb-4">
-            <h2 className="py-2 my-4 text-white bg-red-400 dark:bg-red-500 rounded-md px-4">
-              <FaExclamationTriangle className="inline-block mr-2" />
-              You have unresolved coverages
-            </h2>
-            {renderList(unresolved)}
-          </div>
-        )}
-        <h1 className="text-2xl font-bold my-4">Schedule Table</h1>
-        {renderList(coverages)}
-      </div>
+      {coverages.length > 0 && (
+        <div className="py-6">
+          {unresolved.length > 0 && (
+            <div className="mb-4">
+              <h2 className="py-2 my-4 text-white bg-red-400 dark:bg-red-500 rounded-md px-4">
+                <FaExclamationTriangle className="inline-block mr-2" />
+                You have unresolved coverages
+              </h2>
+              {renderList(unresolved)}
+            </div>
+          )}
+          <h1 className="text-2xl font-bold my-4">Schedule Table</h1>
+          {renderList(coverages)}
+        </div>
+      )}
     </div>
   );
 };
